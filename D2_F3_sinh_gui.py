@@ -33,6 +33,14 @@ def absolute_value(value):
     if value < 0:
         return -value
     return value
+def is_nan(value):
+    """Return True when value is NaN. NaN is the only float unequal to itself."""
+    return value != value
+
+
+def is_infinite_or_too_large(value):
+    """Return True for positive or negative infinity and unsafe huge values."""
+    return value > 1.0e308 or value < -1.0e308
 
 if __name__ == "__main__":
     main()
