@@ -67,5 +67,40 @@ def parse_supported_real_number(text):
 
     return x_value
 
+def calculate_sinh_from_scratch(x_value):
+    """
+    Calculate sinh(x) using the Maclaurin series.
+
+    Recurrence used:
+        term_0 = x
+        term_n = term_(n-1) * x^2 / ((2n)(2n + 1))
+
+    This avoids factorial and exponentiation library functions.
+    """
+    if x_value == 0.0:
+        return 0.0, 1
+
+    total = x_value
+    term = x_value
+    x_squared = x_value * x_value
+    iteration = 1
+
+    while iteration <= MAX_TERMS:
+        denominator = (2 * iteration) * (2 * iteration + 1)
+        term = term * x_squared / denominator
+        total = total + term
+
+        relative_stop = TOLERANCE * (1.0 + absolute_value(total))
+        if absolute_value(term) <= relative_stop:
+            return total, iteration + 1
+
+        iteration = iteration + 1
+
+    raise SinhConvergenceError(
+        "The calculation did not converge within the iteration limit. "
+        "Try an input closer to zero."
+    )
+
+
 if __name__ == "__main__":
     main()
