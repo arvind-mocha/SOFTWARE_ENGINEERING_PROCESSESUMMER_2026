@@ -101,6 +101,71 @@ def calculate_sinh_from_scratch(x_value):
         "Try an input closer to zero."
     )
 
+class SinhCalculatorApp:
+    """Tkinter graphical uttk.Labelface for thtextvariablelculator."""
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title("F3 Hyperbolic Sine Calculator - D2")
+        self.root.geometry("640x420")
+        self.root.minsize(560, 360)
+
+        self.input_value = tk.StringVar()
+        self.status_value = tk.StringVar(value="Enter a real number and click Calculate.")
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        main_frame = ttk.Frame(self.root, padding=20)
+        main_frame.pack(fill="both", expand=True)
+
+        title_label = ttk.Label(
+            main_frame,
+            text="F3: Hyperbolic Sine sinh(x)",
+            font=("Arial", 18, "bold"),
+        )
+        title_label.pack(anchor="w")
+
+        subtitle_label = ttk.Label(
+            main_frame,
+            text="From-scratch Maclaurin series implementation using Tkinter GUI",
+        )
+        subtitle_label.pack(anchor="w", pady=(2, 14))
+
+        input_frame = ttk.Frame(main_frame)
+        input_frame.pack(fill="x", pady=(0, 10))
+
+        input_label = ttk.Label(input_frame, text="Enter x (-20 to 20):")
+        input_label.pack(side="left")
+
+        input_entry = ttk.Entry(input_frame, textvariable=self.input_value, width=28)
+        input_entry.pack(side="left", padx=(10, 0))
+        input_entry.focus()
+        input_entry.bind("<Return>", self.calculate)
+
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill="x", pady=(4, 12))
+
+        calculate_button = ttk.Button(button_frame, text="Calculate", command=self.calculate)
+        calculate_button.pack(side="left")
+
+        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear)
+        clear_button.pack(side="left", padx=(8, 0))
+
+        exit_button = ttk.Button(button_frame, text="Exit", command=self.root.destroy)
+        exit_button.pack(side="left", padx=(8, 0))
+
+        result_label = ttk.Label(main_frame, text="Result and explanation:")
+        result_label.pack(anchor="w")
+
+        self.result_box = tk.Text(main_frame, height=9, wrap="word")
+        self.result_box.pack(fill="both", expand=True, pady=(5, 8))
+        self.result_box.insert("1.0", "No calculation yet.")
+        self.result_box.config(state="disabled")
+
+        status_label = ttk.Label(main_frame, textvariable=self.status_value)
+        status_label.pack(anchor="w")
+
 
 if __name__ == "__main__":
     main()
