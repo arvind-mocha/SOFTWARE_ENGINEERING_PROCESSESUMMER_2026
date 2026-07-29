@@ -40,11 +40,8 @@ python D2_F3_sinh_gui.py
 ## Main files
 
 - `D2_F3_sinh_gui.py` - Tkinter GUI and from-scratch calculation.
-- `Arvind_Lakshmanan_40310757_D2_Report.pdf` - D2 written answers for Problems 5, 6, and 7.
-- `Arvind_Lakshmanan_40310757_D2_Report.tex` - LaTeX source for the report.
 - `Arvind_Lakshmanan_40310757_D2_Slides.pdf` - D2 presentation slides.
 - `Arvind_Lakshmanan_40310757_D2_Slides.tex` - Beamer source for the slides.
-- `commit_messages.md` - High-quality commit message examples.
 
 ## Example outputs
 
