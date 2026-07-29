@@ -166,6 +166,45 @@ class SinhCalculatorApp:
         status_label = ttk.Label(main_frame, textvariable=self.status_value)
         status_label.pack(anchor="w")
 
+def set_result_text(self, message):
+        self.result_box.config(state="normal")
+        self.result_box.delete("1.0", "end")
+        self.result_box.insert("1.0", message)
+        self.result_box.config(state="disabled")
+
+def calculate(self, event=None):
+    try:
+        x_value = parse_supported_real_number(self.input_value.get())
+        result, terms_used = calculate_sinh_from_scratch(x_value)
+        message = (
+            "Input x: " + format(x_value, ".15g") + "\n"
+            "sinh(x): " + format(result, ".15g") + "\n"
+            "Algorithm: Maclaurin series calculated from scratch\n"
+            "Terms used: " + str(terms_used) + "\n\n"
+            "Series used: sinh(x) = x + x^3/3! + x^5/5! + ..."
+        )
+        self.set_result_text(message)
+        self.status_value.set("Calculation completed successfully.")
+    except SinhInputError as error:
+        self.set_result_text("Input error:\n" + str(error))
+        self.status_value.set("Please correct the input and try again.")
+    except SinhConvergenceError as error:
+        self.set_result_text("Calculation error:\n" + str(error))
+        self.status_value.set("The series did not reach the required tolerance.")
+    except Exception as error:
+        self.set_result_text("Unexpected error:\n" + str(error))
+        self.status_value.set("An unexpected error occurred.")
+
+def clear(self):
+    self.input_value.set("")
+    self.set_result_text("No calculation yet.")
+    self.status_value.set("Enter a real number and click Calculate.")
+
+
+def main():
+    root = tk.Tk()
+    app = SinhCalculatorApp(root)
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
