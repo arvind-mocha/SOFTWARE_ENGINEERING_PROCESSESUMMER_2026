@@ -1,23 +1,24 @@
-"""
-SOEN 6011 Delivery 2 - F3: Hyperbolic Sine sinh(x)
+"""Accessible Tkinter calculator for F3: hyperbolic sine ``sinh(x)``.
+
+SOEN 6011 - Delivery 3
 Student: Arvind Lakshmanan
 Student ID: 40310757
 
-This implementation calculates sinh(x) from scratch using the Maclaurin series:
-    sinh(x) = x + x^3/3! + x^5/5! + ...
-
-The mathematical implementation does not use math.sinh, math.exp, or any other
-Python mathematical library function. Tkinter is used only for the graphical
-user interface, as required for D2.
+The numerical implementation computes ``sinh(x)`` from scratch with the
+Maclaurin series. It does not use ``math.sinh``, ``math.exp``, factorial
+helpers, NumPy, SciPy, or another mathematical library for the calculation.
 """
 
 import tkinter as tk
 from tkinter import ttk
 
+__version__ = "1.1.0"
+
 LOWER_LIMIT = -20.0
 UPPER_LIMIT = 20.0
 TOLERANCE = 0.000000000000001
 MAX_TERMS = 200
+WINDOW_TITLE = f"F3 Hyperbolic Sine Calculator - v{__version__}"
 
 
 class SinhInputError(Exception):
