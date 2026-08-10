@@ -110,6 +110,27 @@ def calculate_sinh_from_scratch(x_value):
         "Try an input closer to zero."
     )
 
+class SinhCalculatorApp:
+    """Tkinter graphical interface for the F3 hyperbolic-sine calculator."""
+
+    def __init__(self, root):
+        """Configure the window, state variables, widgets, and shortcuts."""
+        self.root = root
+        self.root.title(WINDOW_TITLE)
+        self.root.geometry("680x470")
+        self.root.minsize(600, 410)
+
+        self.input_value = tk.StringVar()
+        self.status_value = tk.StringVar(
+            value="Ready. Enter a real number from -20 to 20."
+        )
+
+        self.input_entry = None
+        self.result_box = None
+
+        self.create_widgets()
+        self.bind_keyboard_shortcuts()
+
     def create_widgets(self):
         """Create the single-window, keyboard-navigable interface."""
         main_frame = ttk.Frame(self.root, padding=20)
