@@ -111,6 +111,7 @@ def calculate_sinh_from_scratch(x_value):
         "Try an input closer to zero."
     )
 
+
 class SinhCalculatorApp:
     """Tkinter graphical interface for the F3 hyperbolic-sine calculator."""
 
