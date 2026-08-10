@@ -1,0 +1,249 @@
+\documentclass[final]{beamer}
+\usepackage[size=custom,width=91.44,height=60.96,scale=1.04]{beamerposter}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{ragged2e}
+\usepackage{microtype}
+
+% ---------- Theme ----------
+\definecolor{Magenta}{HTML}{C2185B}
+\definecolor{Orange}{HTML}{F57C00}
+\definecolor{DeepPurple}{HTML}{5E2A84}
+\definecolor{Green}{HTML}{2E7D32}
+\definecolor{Red}{HTML}{C62828}
+\definecolor{LightPink}{HTML}{FFF2F7}
+\definecolor{LightOrange}{HTML}{FFF7EE}
+\definecolor{LightGray}{HTML}{F5F5F5}
+\definecolor{DarkText}{HTML}{222222}
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=DarkText,bg=white}
+\setbeamercolor{block title}{fg=white,bg=Magenta}
+\setbeamercolor{block body}{fg=DarkText,bg=white}
+\setbeamercolor{block title alerted}{fg=white,bg=Orange}
+\setbeamercolor{block body alerted}{fg=DarkText,bg=white}
+\setbeamerfont{block title}{series=\bfseries,size=\large}
+\setbeamerfont{block body}{size=\normalsize}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+\newcommand{\tick}{\textcolor{Green}{\bfseries\checkmark}}
+\newcommand{\cross}{\textcolor{Red}{\bfseries$\times$}}
+\newcommand{\tightitem}{\setlength{\itemsep}{0.18em}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}}
+\newcommand{\evidence}[2]{%
+  \begin{minipage}{\linewidth}
+  {\bfseries\textcolor{Magenta}{#1}}\\[0.25em]
+  \centering\includegraphics[width=0.96\linewidth]{#2}
+  \end{minipage}}
+
+\begin{document}
+\begin{frame}[t]
+
+% ---------- Header ----------
+\begin{beamercolorbox}[wd=\textwidth,sep=0.7cm,center,rounded=true]{block title}
+{\fontsize{38}{43}\selectfont\bfseries From-Scratch Implementation and Quality Improvement of $\sinh(x)$}\\[0.25em]
+{\fontsize{19}{23}\selectfont SOEN 6011 -- Software Engineering Processes \quad | \quad Delivery 3 (D3) \quad | \quad Function F3}\\[0.15em]
+{\fontsize{17}{20}\selectfont Arvind Lakshmanan (40310757) \quad | \quad Concordia University \quad | \quad Summer 2026}
+\end{beamercolorbox}
+\vspace{0.45cm}
+
+\begin{columns}[t,totalwidth=\textwidth]
+% ==================== COLUMN 1 ====================
+\begin{column}{0.318\textwidth}
+
+\begin{block}{Project Evolution}
+\small
+\begin{center}
+\begin{tikzpicture}[node distance=1.2cm, every node/.style={font=\small}]
+\node[draw=Magenta,rounded corners=7pt,fill=LightPink,text width=7.0cm,inner sep=8pt] (d1) {
+\textbf{D1}\\Persona; requirements; two pseudocode algorithms; algorithm-selection mind map; initial Python TUI.};
+\node[draw=Orange,rounded corners=7pt,fill=LightOrange,text width=7.0cm,inner sep=8pt,right=0.9cm of d1] (d2) {
+\textbf{D2}\\From-scratch implementation; Tkinter GUI; exception handling; public version control/README; updated requirements.};
+\node[draw=DeepPurple,rounded corners=7pt,fill=LightPink,text width=7.0cm,inner sep=8pt,right=0.9cm of d2] (d3) {
+\textbf{D3}\\PEP-8 improvement; Flake8; pdb; Pylint; Semantic Versioning 1.1.0; UIDP/accessibility; PyUnit tests.};
+\draw[-{Latex[length=4mm]},thick,Magenta] (d1) -- (d2);
+\draw[-{Latex[length=4mm]},thick,Orange] (d2) -- (d3);
+\end{tikzpicture}
+\end{center}
+\end{block}
+
+\begin{block}{Methodology}
+\small
+\justifying
+The calculator computes $\sinh(x)$ \textbf{from scratch} using a recurrence-based Maclaurin series. The production calculation does not call \texttt{math.sinh}, \texttt{math.exp}, factorial helpers, NumPy, or SciPy.
+
+\vspace{0.45em}
+\begin{beamercolorbox}[rounded=true,sep=0.35cm,wd=0.96\linewidth]{block body alerted}
+\centering
+{\bfseries Maclaurin series}\\[0.2em]
+$\displaystyle \sinh(x)=x+\frac{x^3}{3!}+\frac{x^5}{5!}+\cdots$
+\end{beamercolorbox}
+
+\vspace{0.35em}
+\begin{beamercolorbox}[rounded=true,sep=0.35cm,wd=0.96\linewidth]{block body alerted}
+\centering
+{\bfseries Recurrence relation}\\[0.2em]
+$\displaystyle t_0=x,\qquad t_k=t_{k-1}\frac{x^2}{(2k)(2k+1)}$
+\end{beamercolorbox}
+
+\vspace{0.45em}
+\begin{center}
+\begin{tikzpicture}[node distance=0.45cm, every node/.style={font=\scriptsize,align=center}]
+\node[draw=Magenta,rounded corners,fill=LightPink,minimum width=3.1cm,minimum height=1.7cm] (a) {Input $x$\\validate $[-20,20]$};
+\node[draw=Orange,rounded corners,fill=LightOrange,minimum width=3.1cm,minimum height=1.7cm,right=of a] (b) {Initialize\\$t=x,\;s=x$};
+\node[draw=Orange,rounded corners,fill=LightOrange,minimum width=3.1cm,minimum height=1.7cm,right=of b] (c) {Iterate recurrence\\add to sum};
+\node[draw=Green,rounded corners,fill=white,minimum width=3.1cm,minimum height=1.7cm,right=of c] (d) {Converged?\\relative tolerance};
+\node[draw=DeepPurple,rounded corners,fill=LightPink,minimum width=3.1cm,minimum height=1.7cm,right=of d] (e) {Return\\$s\approx\sinh(x)$};
+\foreach \x/\y in {a/b,b/c,c/d,d/e}{\draw[-{Latex[length=3mm]},thick] (\x)--(\y);}
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.35em}
+\centering
+\textbf{Stopping rule:} $|t_k|\le 10^{-15}(1+|s|)$ or maximum \textbf{200} terms.
+\end{block}
+
+\begin{block}{Correctness and Range}
+\small
+\begin{itemize}\tightitem
+\item Supported input: one finite real number with $-20\le x\le20$.
+\item Invalid, blank, NaN, infinity, and out-of-range inputs raise a helpful custom error.
+\item The recurrence preserves the odd-function property $\sinh(-x)=-\sinh(x)$.
+\item Version shown in source and GUI: \textbf{1.1.0}.
+\end{itemize}
+\end{block}
+
+\begin{block}{GAI / CASTROFF Use}
+\small
+\textbf{GAI tool:} ChatGPT (OpenAI). Prompts were structured with CASTROFF:\\
+\textbf{C}onstraints, \textbf{A}udience, \textbf{S}tructure, \textbf{T}one, \textbf{R}ole, \textbf{O}utput Format, \textbf{F}ocus, \textbf{F}unction.
+\begin{itemize}\tightitem
+\item \textbf{Problem 7:} compliance review/refinement for PEP-8, UIDP, accessibility, and evidence planning.
+\item \textbf{Problem 8:} unit-test coverage review and PyUnit test design.
+\item Real Flake8, Pylint, pdb, and unittest results were \textbf{verified from actual tool evidence}, not generated by GAI.
+\end{itemize}
+\textit{Full CASTROFF prompt examples and output explanations are provided in the accompanying GAI document.}
+\end{block}
+
+\end{column}
+\hfill
+% ==================== COLUMN 2 ====================
+\begin{column}{0.334\textwidth}
+
+\begin{alertblock}{Results \& Quality Evidence}
+\small
+\textbf{Flake8 style check}\par
+\includegraphics[width=\linewidth]{Evidence/flake8.png}
+\vspace{0.15em}
+\tick\ Flake8 returned to the prompt with no listed style violations.
+
+\vspace{0.45em}
+\textbf{Pylint static analysis}\par
+\includegraphics[width=\linewidth]{Evidence/pylint.png}
+\vspace{0.15em}
+\tick\ Pylint score: \textbf{9.86/10}, with two minor warnings shown in the evidence.
+
+\vspace{0.45em}
+\textbf{pdb debugger}\par
+\includegraphics[width=\linewidth]{Evidence/pdb.png}
+\vspace{0.15em}
+\tick\ The debugger stepped through \texttt{calculate\_sinh\_from\_scratch} and inspected intermediate state.
+\end{alertblock}
+
+\begin{block}{GUI Design, UIDP \& Accessibility}
+\scriptsize
+\begin{columns}[t,totalwidth=\linewidth]
+\begin{column}{0.43\linewidth}
+\centering\includegraphics[width=\linewidth]{Evidence/gui.png}
+\end{column}
+\begin{column}{0.54\linewidth}
+\begin{itemize}\tightitem
+\item \textbf{Consistency:} uniform layout/controls.
+\item \textbf{Visibility:} clear labels, results, status.
+\item \textbf{Feedback:} textual success/error messages.
+\item \textbf{Error prevention:} validates $-20\le x\le20$.
+\item \textbf{Simplicity:} short calculation flow.
+\item \textbf{User control:} Calculate, Clear, Exit, re-entry.
+\item \textbf{Accessibility:} no color-only meaning.
+\item \textbf{Keyboard:} Enter/Alt+C, Alt+L, Escape, Tab.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{block}
+
+\end{column}
+\hfill
+% ==================== COLUMN 3 ====================
+\begin{column}{0.318\textwidth}
+
+\begin{block}{Testing — PyUnit / unittest Evidence}
+\small
+\centering
+\includegraphics[width=0.98\linewidth]{Evidence/tests.png}
+\vspace{0.35em}
+\begin{itemize}\tightitem
+\item \textbf{Total tests: 16}
+\item \textbf{Result: all tests passed (OK)}
+\item Coverage includes helpers, parsing, valid/invalid inputs, NaN/infinity rejection, boundaries, known values, zero, and $\sinh(-x)=-\sinh(x)$.
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{UIDP Decision Mind Map}
+\small
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm, every node/.style={font=\scriptsize,align=center}]
+\node[draw=DeepPurple,very thick,circle,minimum size=3.3cm,fill=LightPink] (center) at (0,0) {\bfseries UIDP\\for F3 GUI};
+
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a1) at (-7.0,4.2) {Consistency};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a2) at (-7.0,3.0) {Visibility};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a3) at (-7.0,1.8) {Feedback};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a4) at (-7.0,0.6) {Error prevention};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a5) at (-7.0,-0.6) {Simplicity};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a6) at (-7.0,-1.8) {User control};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a7) at (-7.0,-3.0) {Accessibility};
+\node[draw=Green,rounded corners,fill=white,text width=4.0cm] (a8) at (-7.0,-4.2) {Keyboard-friendly interaction};
+
+\node[draw=Red,rounded corners,fill=white,text width=4.8cm] (n1) at (7.2,2.7) {Multi-user collaboration};
+\node[draw=Red,rounded corners,fill=white,text width=4.8cm] (n2) at (7.2,0.9) {Complex customization};
+\node[draw=Red,rounded corners,fill=white,text width=4.8cm] (n3) at (7.2,-0.9) {Advanced personalization};
+\node[draw=Red,rounded corners,fill=white,text width=4.8cm] (n4) at (7.2,-2.7) {Gesture-based input};
+
+\foreach \n in {a1,a2,a3,a4,a5,a6,a7,a8}{\draw[Green,thick] (\n.east)--(center.west);}
+\foreach \n in {n1,n2,n3,n4}{\draw[Red,thick] (center.east)--(\n.west);}
+\node[text=Green,font=\small\bfseries] at (-6.9,5.25) {Applies};
+\node[text=Red,font=\small\bfseries] at (7.2,4.1) {Does not strongly apply};
+\end{tikzpicture}
+
+\vspace{0.4em}
+\begin{beamercolorbox}[rounded=true,sep=0.3cm,wd=0.94\linewidth]{block body alerted}
+\centering Chosen because the application is a \textbf{single-user calculator with a simple task flow}; principles were selected according to their relevance to this interface.
+\end{beamercolorbox}
+\end{alertblock}
+
+\begin{block}{D3 Completion Summary}
+\small
+\begin{itemize}\tightitem
+\item \tick\ PEP-8-oriented implementation and Flake8 evidence.
+\item \tick\ pdb debugging evidence.
+\item \tick\ Pylint static analysis evidence.
+\item \tick\ Semantic Versioning 1.1.0.
+\item \tick\ UIDP decision mind map and accessibility improvements.
+\item \tick\ 16 PyUnit/unittest test cases, all passing in the submitted evidence.
+\item \tick\ CASTROFF-based GAI documentation for Problems 7 and 8.
+\end{itemize}
+\end{block}
+
+\end{column}
+\end{columns}
+
+\vfill
+\begin{center}
+\scriptsize
+\textbf{References:} SOEN 6011 Project Description, Summer 2026; PEP 8; Python \texttt{unittest}; CASTROFF framework (Constraints, Audience, Structure, Tone, Role, Output Format, Focus, Function).
+\end{center}
+
+\end{frame}
+\end{document}
