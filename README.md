@@ -1,53 +1,63 @@
-# SOEN 6011 D2 - F3: Hyperbolic Sine Calculator
+# SOEN 6011 Delivery 3 - F3: Hyperbolic Sine Calculator
 
 **Student:** Arvind Lakshmanan  
 **Student ID:** 40310757  
-**Course:** SOEN 6011 - Software Engineering Processes  
-**Function:** F3 - `sinh(x)`
+**Function:** F3 - `sinh(x)`  
+**Semantic version:** `1.1.0`
 
-## What this project contains
+## D3 implementation
 
-This D2 implementation modifies the D1 textual calculator into a Tkinter GUI calculator and implements `sinh(x)` from scratch in Python.
+D3 keeps the D2 from-scratch Maclaurin calculation and the supported range
+`-20 <= x <= 20`. It improves the implementation for code quality, usability,
+accessibility, debugging, static analysis, semantic versioning, and unit tests.
 
-The function is calculated using the Maclaurin series:
+### Main D3 changes
 
-`sinh(x) = x + x^3/3! + x^5/5! + ...`
+- PEP-8-oriented formatting, naming, docstrings, and separation of GUI helpers.
+- Semantic version `1.1.0` displayed in the source and GUI.
+- Keyboard alternatives: Enter or Alt+C to calculate, Alt+L to clear, Escape
+  to exit, plus ordinary Tab navigation.
+- Visible instructions and textual status/error feedback; the interface does
+  not depend on color alone.
+- Read-only result area, sensible initial focus, resizable window, and concise
+  labels.
+- PyUnit (`unittest`) test suite with 16 tests.
+- `pdb` debugging demonstration.
+- Commands prepared for Flake8 and Pylint evidence.
 
-The mathematical implementation does not use `math.sinh`, `math.exp`, or any Python math-library function. Tkinter is used only for the graphical user interface.
-
-## Supported input
-
-- One finite real number `x`
-- Supported D2 range: `-20 <= x <= 20`
-- Examples: `0`, `1`, `-2.5`, `3e-2`
-
-Inputs outside this range, blank inputs, non-numeric inputs, NaN, and infinity are rejected with helpful error messages.
-
-## How to run
-
-From the project folder, run:
-
-```bash
-python3 D2_F3_sinh_gui.py
-```
-
-On Windows, the command may be:
+## Run the application
 
 ```bash
-python D2_F3_sinh_gui.py
+python D3_F3_sinh_gui.py
 ```
 
-## Main files
+## Run unit tests
 
-- `D2_F3_sinh_gui.py` - Tkinter GUI and from-scratch calculation.
-- `Arvind_Lakshmanan_40310757_D2_Slides.pdf` - D2 presentation slides.
-- `Arvind_Lakshmanan_40310757_D2_Slides.tex` - Beamer source for the slides.
+```bash
+python -m unittest -v test_D3_F3_sinh_gui.py
+```
 
-## Example outputs
+Expected result: `Ran 16 tests ... OK`.
 
-| Input | Expected approximate output |
-|---:|---:|
-| `0` | `0` |
-| `1` | `1.1752011936438` |
-| `-1` | `-1.1752011936438` |
-| `3` | `10.0178749274099` |
+## Required quality-tool evidence
+
+Install the tools if necessary:
+
+```bash
+python -m pip install flake8 pylint
+```
+
+Run Flake8:
+
+```bash
+python -m flake8 D3_F3_sinh_gui.py test_D3_F3_sinh_gui.py
+```
+
+A clean Flake8 run normally prints no violations. Capture a screenshot that
+shows the command and the terminal prompt returning.
+
+Run Pylint:
+
+```bash
+python -m pylint D3_F3_sinh_gui.py
+```

@@ -21,7 +21,7 @@ MAX_TERMS = 200
 
 
 class SinhInputError(Exception):
-    """Raised when the user input cannot be used as a supported real number."""
+    """Raised when the entered value is not a supported real number."""
 
 
 class SinhConvergenceError(Exception):
@@ -29,42 +29,47 @@ class SinhConvergenceError(Exception):
 
 
 def absolute_value(value):
-    """Return the non-negative size of a number without using abs()."""
+    """Return the non-negative magnitude of ``value`` without ``abs()``."""
     if value < 0:
         return -value
     return value
 
 
 def is_nan(value):
-    """Return True when value is NaN. NaN is the only float unequal to itself."""
+    """Return whether ``value`` is NaN using the self-inequality property."""
     return value != value
 
 
 def is_infinite_or_too_large(value):
-    """Return True for positive or negative infinity and unsafe huge values."""
+    """Return whether ``value`` is infinite or outside a safe float range."""
     return value > 1.0e308 or value < -1.0e308
 
 
 def parse_supported_real_number(text):
-    """Convert the user entry to a supported finite real number."""
+    """Convert text to one finite supported real number in ``[-20, 20]``."""
     cleaned_text = text.strip()
 
     if cleaned_text == "":
-        raise SinhInputError("Please enter one real number, such as -2, 0.5, or 3e-2.")
+        raise SinhInputError(
+            "Please enter one real number, such as -2, 0.5, or 3e-2."
+        )
 
     try:
         x_value = float(cleaned_text)
     except ValueError as exc:
         raise SinhInputError(
-            "The input must be one real number. Do not enter letters, commas, or multiple values."
+            "The input must be one real number. Do not enter letters, "
+            "commas, or multiple values."
         ) from exc
 
     if is_nan(x_value) or is_infinite_or_too_large(x_value):
-        raise SinhInputError("The input must be a finite real number, not NaN or infinity.")
+        raise SinhInputError(
+            "The input must be a finite real number, not NaN or infinity."
+        )
 
     if x_value < LOWER_LIMIT or x_value > UPPER_LIMIT:
         raise SinhInputError(
-            "This D2 from-scratch implementation supports only -20 <= x <= 20. "
+            "This calculator supports only -20 <= x <= 20. "
             "Please enter a value inside this range."
         )
 
@@ -72,14 +77,14 @@ def parse_supported_real_number(text):
 
 
 def calculate_sinh_from_scratch(x_value):
-    """
-    Calculate sinh(x) using the Maclaurin series.
+    """Calculate ``sinh(x)`` using a recurrence form of its Maclaurin series.
 
-    Recurrence used:
+    The recurrence is::
+
         term_0 = x
         term_n = term_(n-1) * x^2 / ((2n)(2n + 1))
 
-    This avoids factorial and exponentiation library functions.
+    Returns a tuple containing the approximation and the number of terms used.
     """
     if x_value == 0.0:
         return 0.0, 1
@@ -105,25 +110,19 @@ def calculate_sinh_from_scratch(x_value):
         "Try an input closer to zero."
     )
 
-
-class SinhCalculatorApp:
-    """Tkinter graphical user interface for the F3 sinh calculator."""
-
-    def __init__(self, root):
-        self.root = root
-        self.root.title("F3 Hyperbolic Sine Calculator - D2")
-        self.root.geometry("640x420")
-        self.root.minsize(560, 360)
-
-        self.input_value = tk.StringVar()
-        self.status_value = tk.StringVar(value="Enter a real number and click Calculate.")
-
-        self.create_widgets()
-
     def create_widgets(self):
+        """Create the single-window, keyboard-navigable interface."""
         main_frame = ttk.Frame(self.root, padding=20)
         main_frame.pack(fill="both", expand=True)
 
+        self.create_header(main_frame)
+        self.create_input_area(main_frame)
+        self.create_button_area(main_frame)
+        self.create_result_area(main_frame)
+
+    @staticmethod
+    def create_header(main_frame):
+        """Create the title, version, and concise usage instructions."""
         title_label = ttk.Label(
             main_frame,
             text="F3: Hyperbolic Sine sinh(x)",
@@ -131,84 +130,156 @@ class SinhCalculatorApp:
         )
         title_label.pack(anchor="w")
 
-        subtitle_label = ttk.Label(
+        version_label = ttk.Label(
             main_frame,
-            text="From-scratch Maclaurin series implementation using Tkinter GUI",
+            text=f"Version {__version__} | From-scratch Maclaurin series",
         )
-        subtitle_label.pack(anchor="w", pady=(2, 14))
+        version_label.pack(anchor="w", pady=(2, 4))
 
+        instruction_label = ttk.Label(
+            main_frame,
+            text=(
+                "Enter one finite real number from -20 to 20. "
+                "Press Enter or Alt+C to calculate."
+            ),
+            wraplength=620,
+        )
+        instruction_label.pack(anchor="w", pady=(0, 14))
+
+    def create_input_area(self, main_frame):
+        """Create a labelled, keyboard-focusable input field."""
         input_frame = ttk.Frame(main_frame)
         input_frame.pack(fill="x", pady=(0, 10))
 
-        input_label = ttk.Label(input_frame, text="Enter x (-20 to 20):")
+        input_label = ttk.Label(
+            input_frame,
+            text="Enter x (-20 to 20):",
+            underline=0,
+        )
         input_label.pack(side="left")
 
-        input_entry = ttk.Entry(input_frame, textvariable=self.input_value, width=28)
-        input_entry.pack(side="left", padx=(10, 0))
-        input_entry.focus()
-        input_entry.bind("<Return>", self.calculate)
+        self.input_entry = ttk.Entry(
+            input_frame,
+            textvariable=self.input_value,
+            width=30,
+            takefocus=True,
+        )
+        self.input_entry.pack(side="left", padx=(10, 0), fill="x", expand=True)
+        self.input_entry.focus_set()
+        self.input_entry.bind("<Return>", self.calculate)
 
+    def create_button_area(self, main_frame):
+        """Create the three primary action buttons in a consistent row."""
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill="x", pady=(4, 12))
 
-        calculate_button = ttk.Button(button_frame, text="Calculate", command=self.calculate)
+        calculate_button = ttk.Button(
+            button_frame,
+            text="Calculate",
+            command=self.calculate,
+            takefocus=True,
+        )
         calculate_button.pack(side="left")
 
-        clear_button = ttk.Button(button_frame, text="Clear", command=self.clear)
+        clear_button = ttk.Button(
+            button_frame,
+            text="Clear",
+            command=self.clear,
+            takefocus=True,
+        )
         clear_button.pack(side="left", padx=(8, 0))
 
-        exit_button = ttk.Button(button_frame, text="Exit", command=self.root.destroy)
+        exit_button = ttk.Button(
+            button_frame,
+            text="Exit",
+            command=self.root.destroy,
+            takefocus=True,
+        )
         exit_button.pack(side="left", padx=(8, 0))
 
+    def create_result_area(self, main_frame):
+        """Create read-only output and a separate textual status message."""
         result_label = ttk.Label(main_frame, text="Result and explanation:")
         result_label.pack(anchor="w")
 
-        self.result_box = tk.Text(main_frame, height=9, wrap="word")
+        self.result_box = tk.Text(
+            main_frame,
+            height=9,
+            wrap="word",
+            takefocus=True,
+            font=("Arial", 11),
+        )
         self.result_box.pack(fill="both", expand=True, pady=(5, 8))
-        self.result_box.insert("1.0", "No calculation yet.")
-        self.result_box.config(state="disabled")
+        self.set_result_text("No calculation yet.")
 
-        status_label = ttk.Label(main_frame, textvariable=self.status_value)
+        status_heading = ttk.Label(main_frame, text="Status:")
+        status_heading.pack(anchor="w")
+
+        status_label = ttk.Label(
+            main_frame,
+            textvariable=self.status_value,
+            wraplength=620,
+        )
         status_label.pack(anchor="w")
 
+    def bind_keyboard_shortcuts(self):
+        """Provide keyboard alternatives for the main GUI actions."""
+        self.root.bind("<Alt-c>", self.calculate)
+        self.root.bind("<Alt-C>", self.calculate)
+        self.root.bind("<Alt-l>", self.clear)
+        self.root.bind("<Alt-L>", self.clear)
+        self.root.bind("<Escape>", self.close)
+
     def set_result_text(self, message):
+        """Replace the result area text while keeping it read-only."""
         self.result_box.config(state="normal")
         self.result_box.delete("1.0", "end")
         self.result_box.insert("1.0", message)
         self.result_box.config(state="disabled")
 
-    def calculate(self, event=None):
+    def calculate(self, _event=None):
+        """Validate the entry, calculate ``sinh(x)``, and show the result."""
         try:
             x_value = parse_supported_real_number(self.input_value.get())
             result, terms_used = calculate_sinh_from_scratch(x_value)
             message = (
-                "Input x: " + format(x_value, ".15g") + "\n"
-                "sinh(x): " + format(result, ".15g") + "\n"
+                f"Input x: {x_value:.15g}\n"
+                f"sinh(x): {result:.15g}\n"
                 "Algorithm: Maclaurin series calculated from scratch\n"
-                "Terms used: " + str(terms_used) + "\n\n"
-                "Series used: sinh(x) = x + x^3/3! + x^5/5! + ..."
+                f"Terms used: {terms_used}\n\n"
+                "Series: sinh(x) = x + x^3/3! + x^5/5! + ..."
             )
             self.set_result_text(message)
             self.status_value.set("Calculation completed successfully.")
         except SinhInputError as error:
             self.set_result_text("Input error:\n" + str(error))
-            self.status_value.set("Please correct the input and try again.")
+            self.status_value.set(
+                "Input needs correction. Review the message above and retry."
+            )
         except SinhConvergenceError as error:
             self.set_result_text("Calculation error:\n" + str(error))
-            self.status_value.set("The series did not reach the required tolerance.")
-        except Exception as error:
-            self.set_result_text("Unexpected error:\n" + str(error))
-            self.status_value.set("An unexpected error occurred.")
+            self.status_value.set(
+                "The series did not reach the required tolerance."
+            )
 
-    def clear(self):
+    def clear(self, _event=None):
+        """Reset the input, output, status message, and keyboard focus."""
         self.input_value.set("")
         self.set_result_text("No calculation yet.")
-        self.status_value.set("Enter a real number and click Calculate.")
+        self.status_value.set(
+            "Ready. Enter a real number from -20 to 20."
+        )
+        self.input_entry.focus_set()
+
+    def close(self, _event=None):
+        """Close the application; used by the Escape keyboard shortcut."""
+        self.root.destroy()
 
 
 def main():
+    """Create and run the Tkinter application."""
     root = tk.Tk()
-    app = SinhCalculatorApp(root)
+    SinhCalculatorApp(root)
     root.mainloop()
 
 
